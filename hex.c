@@ -6,26 +6,49 @@ typedef struct {
     int l, c;
 } par;
 
-typedef struct {
-    int t, num_j;
-    par *coord;
-} vetor;
-
 void recebeJogada (int *op_lin, int *op_col) {
     printf("Insira sua jogada.\n");
     scanf("%d %d", op_lin, op_col);
 }
 
-/*Forma caminho por linhas*/
-void encontraJogadaB (char **tab, vetor jogadas) {
-    int i, j, swap;
-    swap = 0;
-    if (jogadas.t)
+int mov_1 (char **tab, par p, par *c) {
+    if (p.l > 2 && p.c < 12)
+        if (tab[p.l][p.c] )
+}
 
-    for (i = 0; i < 14; i++)
-        for (j = 0; j < 14; j++)
-            if (jogadas.t == 1 && tab[i][j] == 'p')
-                swap = 1;
+int mov_2 (char ** tab, par p, par *c) {
+
+}
+
+/*Forma caminho por linhas*/
+void encontraJogadaB (char **tab, int conta_jogadas) {
+    int i, j, mov;
+    par cord, pos;
+
+    mov = 1;
+
+    if (conta_jogadas) {
+        for (i = 0; i < 14 && mov; i++) {
+            for (j = 0; j < 14 && mov; j++) {
+                pos.l = i; 
+                pos.c = j;
+                if (tab[i][j] == 'b') {
+
+                    /* prioridade para pontes que devem ser formadas,
+                      (pretas ocuparam uma das duas posições). */
+                    if (mov_1(tab, pos, &cord)) {
+                        tab[cord.l][cord.c] = 'b';
+                        mov = 0;
+                    }
+                    else if (mov_2(tab, pos, &cord)) {
+                        tab[cord.l][cord.c] = 'b';
+                        mov = 0;
+                    }
+
+                }
+            }
+        }
+    }
 }
 
 /*Forma caminhos por colunas*/
@@ -54,33 +77,6 @@ void fazMovimento (char **tab, int lin, int col, int vez, char *pecas) {
     }   
 }
 
-vetor criaVetordeJogadas () {
-    vetor j;
-    j.t = 28;
-    j.coord = malloc(j.t*sizeof(par));
-    j.num_j = 0;
-
-    return j;
-}
-
-void realocaVetordeJogadas (vetor j) {
-    int i;
-    par *v;
-
-    v = malloc(2*j.t*sizeof(par));
-
-    for (i = 0; i < j.t; i++) {
-        v[i] = j.coord[i];
-    }
-
-    free(j.coord);
-    j.coord = v;
-    j.t *= 2;
-}
-
-void destroiVetordeJogadas (vetor j) {
-    free(j.coord);
-}
 
 char** criaTabuleiro () {
 
