@@ -6,28 +6,124 @@ typedef struct {
     int l, c;
 } par;
 
+typedef struct {
+    int ind, tam, num;
+    par *jog;
+} jogadas;
+
 void recebeJogada (int *op_lin, int *op_col) {
     printf("Insira sua jogada.\n");
     scanf("%d %d", op_lin, op_col);
 }
 
-int mov_1 (char **tab, par p, par *c) {
-    if (p.l > 2 && p.c < 12)
-        if (tab[p.l][p.c] )
+/*Movimento 1 e 2 são de ataque (ponte e parede, respectivamente)*/
+int mov_1_cima_B (char **tab, par p, par *c) {
+    if (p.l >= 2 && p.c <= 12) {
+        if (tab[p.l - 2][p.c + 1] == '-') {
+            if (tab[p.l - 1][p.c] == '-' && tab[p.l - 1][p.c + 1] == '-') {
+                c->l = p.l - 2;
+                c->c = p.c + 1;
+                return 1;
+            }
+        }
+        else if (tab[p.l - 2][p.c + 1] == 'b') {
+            if (tab[p.l - 1][p.c] == '-' && tab[p.l - 1][p.c + 1] == 'p') {
+                c->l = p.l - 1;
+                c->c = p.c;
+                return 1;
+            }
+            else if (tab[p.l - 1][p.c] == 'p' && tab[p.l - 1][p.c + 1] == '-') {
+                c->l = p.l - 1;
+                c->c = p.c + 1;
+                return 1;
+            }
+        }
+    }
+
+    return 0;
 }
 
-int mov_2 (char ** tab, par p, par *c) {
 
+int mov_1_baixo_B (char ** tab, par p, par *c) {
+
+    if (p.l <= 11 && p.c >= 1) {
+        if (tab[p.l + 2][p.c - 1] == '-') {
+            if (tab[p.l + 1][p.c] == '-' && tab[p.l + 1][p.c - 1] == '-') {
+                c->l = p.l + 2;
+                c->c = p.c - 1;
+                return 1;
+            }
+        }
+        else if (tab[p.l + 2][p.c - 1] == 'b') {
+            if (tab[p.l + 1][p.c] == '-' && tab[p.l + 1][p.c - 1] == 'p') {
+                c->l = p.l + 1;
+                c->c = p.c;
+                return 1;
+            }
+            else if (tab[p.l + 1][p.c] == 'p' && tab[p.l + 1][p.c - 1] == '-') {
+                c->l = p.l + 1;
+                c->c = p.c - 1;
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
+
+int mov_2_cima_B (char ** tab, par p, par *c) {
+    if (p.l >= 1) {
+        if (p.c <= 12 && tab[p.l - 1][p.c] == 'p') {
+            if (tab[p.l - 1][p.c + 1] == '-') {
+                c->l = p.l - 1;
+                c->c = p.c + 1;
+                return 1;
+            }
+        }
+        else if (p.c <= 12 && tab[p.l - 1][p.c + 1] == 'p') {
+            if (tab[p.l - 1][p.c] == '-') {
+                c->l = p.l - 1;
+                c->c = p.c;
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+int mov_2_baixo_B (char ** tab, par p, par *c) {
+    if (p.l <= 12) {
+        if (p.c >= 1 && tab[p.l + 1][p.c] == 'p') {
+            if (tab[p.l + 1][p.c - 1] == '-') {
+                c->l = p.l + 1;
+                c->c = p.c - 1;
+                return 1;
+            }
+        }
+        else if (p.c >= 1 && tab[p.l + 1][p.c - 1] == 'p') {
+            if (tab[p.l + 1][p.c] == '-') {
+                c->l = p.l + 1;
+                c->c = p.c;
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+/*Movimentos 3 e 4 são de defesa*/
+
+
+
+
 
 /*Forma caminho por linhas*/
-void encontraJogadaB (char **tab, int conta_jogadas) {
+void encontraJogadaB (char **tab, jogadas feitas) {
     int i, j, mov;
     par cord, pos;
 
     mov = 1;
 
-    if (conta_jogadas) {
+    if (feitas.num) {
         for (i = 0; i < 14 && mov; i++) {
             for (j = 0; j < 14 && mov; j++) {
                 pos.l = i; 
@@ -36,11 +132,11 @@ void encontraJogadaB (char **tab, int conta_jogadas) {
 
                     /* prioridade para pontes que devem ser formadas,
                       (pretas ocuparam uma das duas posições). */
-                    if (mov_1(tab, pos, &cord)) {
+                    if (mov_1_B(tab, pos, &cord)) {
                         tab[cord.l][cord.c] = 'b';
                         mov = 0;
                     }
-                    else if (mov_2(tab, pos, &cord)) {
+                    else if (mov_2_B(tab, pos, &cord)) {
                         tab[cord.l][cord.c] = 'b';
                         mov = 0;
                     }
