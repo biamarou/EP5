@@ -52,10 +52,20 @@ void imprimeTabuleiro (char **tab) {
     }
 }
 
-par recebeJogada () {
+par recebeJogada (char **tab) {
     par oponente;
     printf("Insira sua jogada.\n");
     scanf("%d %d", &oponente.l, &oponente.c);
+    
+    while (lin < 0 || lin > 13 || col < 0 || col > 13) {
+        printf("Movimento inválido. Insira um novo.\n");
+        scanf("%d %d", &oponente.l, &oponente.c);
+    }
+
+    while (tab[oponente.l][oponente.c] != '-') {
+        printf("Posição já ocupada. Insira nova jogada.\n");
+        scanf("%d %d", &oponente.l, &oponente.c);
+    }
     return oponente;
 }
 
@@ -326,15 +336,10 @@ void encontraJogadaB (char **tab, jogadas *possiveis) {
 
     else {
         tab[6][6] = 'b';
-        cord.l = cord.c = 6;
+        cord.l = cord.c = cord.p = 6;
         possiveis->jog[possiveis->ind] = cord;
         possiveis->ind = 1;
     }
-}
-
-/*Forma caminhos por colunas*/
-void encontraJogadaP (char **tab) {
-
 }
 
 void imprimeJogada (int lin, int col) {
@@ -347,10 +352,6 @@ void fazMovimento (char **tab, int lin, int col, int vez, char pecas) {
     
     else {
         
-        while (lin < 0 || lin > 13 || col < 0 || col > 13) {
-            printf("Movimento inválido. Insira um novo.\n");
-            scanf("%d %d", &lin, &col);
-        }
         if (pecas == 'b')
             tab[lin][col] = 'p';
         else
@@ -358,17 +359,39 @@ void fazMovimento (char **tab, int lin, int col, int vez, char pecas) {
     }   
 }
 
+int verificaTroca (char **tab) {
+    int i, j;
+    for (i = 0; i < 14; i++) {
+        for (j = 0; j < 14; j++) {
+            if (tab[i][j] == 'p')
+                return 0;
+        }
+    }
+    
+    return 1;
+}
+
 void simulaJogoB (char **tab, char *imp) {
     int cont = 0;
-    int i, ataque, defesa;
+    int i, ataque, defesa, pie;
     par op, m_at, m_df;
     jogadas p;
 
+    pie = 0;
     p = criaVetorJogadas(); 
 
     while (cont < 10) {
+        
+        if (pie == 1) {
+            if (verificaTroca(tab)) {
+                simulaJogoP(tab, imp);
+                return;
+            }
+        }
+
         ataque = defesa = 0;
         m_at.p = m_df.p = 0;
+
         encontraJogadaB(tab, &p);
         for (i = 0; i < p.ind; i++) {
             if (p.jog[i].p >= 1 && p.jog[i].p <= 6) {
@@ -382,16 +405,22 @@ void simulaJogoB (char **tab, char *imp) {
                     m_df = p.jog[i];
             }
         }
-        if (ataque >= defesa)
+
+        if (ataque >= defesa) {
             fazMovimento(tab, m_at.l, m_at.c, 1, 'b');
-        else
+            imprimeJogada(m_at.l, m_at.c);
+        }
+        else {
             fazMovimento(tab, m_df.l, m_df.c, 1, 'b');
+            imprimeJogada(m_df.l, m_df.c);
+        }
         
         imprimeTabuleiro(tab);
         op = recebeJogada();
         fazMovimento(tab, op.l, op.c, 0, 'b');
         imprimeTabuleiro(tab);
         cont++;
+        pie++;
     }
 }
 
@@ -406,14 +435,17 @@ int main (int argc, char **argv) {
 
     tabuleiro = criaTabuleiro();
 
-    if (strcmp(pecas, "b") == 0)
+    if (strcmp(pecas, "b") == 0) {
         printf("eu começo\n");
-    else if (strcmp(pecas, "p") == 0)
+        simulaJogoB(tabuleiro, imprime);
+    }
+
+    else if (strcmp(pecas, "p") == 0){
         printf("você começa\n");
+        simulaJogoP(tabuleiro, imprime);
+    }
     else
         printf("argumento inválido\n");
-
-    simulaJogoB(tabuleiro, imprime);
 
     return 0;
 }
