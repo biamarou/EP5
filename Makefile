@@ -1,7 +1,7 @@
 CC:=gcc
 CFLAGS:=-Wall -pedantic -ansi -g 
 
-ep5: hex.c
+ep5: hex.c simulaBrancas.c simulaPretas.c simulaMovimento.c vetorJogadas.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 %.o: %.c
